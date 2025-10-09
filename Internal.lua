@@ -1349,7 +1349,7 @@ local function C_a()
 	local button = script.Parent
 	local ReplicatedStorage = game:GetService("ReplicatedStorage")
 	local StarterGui = game:GetService("StarterGui")
-	local remoteTimeout = 1.4
+	local remoteTimeout = 1.7
 
 
 	local exec = script.Parent.Parent.Parent.Exec 
