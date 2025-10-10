@@ -1343,29 +1343,38 @@ G2L["9e"]["Name"] = [[Editor]];
 
 -- StarterGui.ScreenGui.Scanner.Scan.LocalScript
 local function C_a()
-	local script = G2L["a"];
-
-
+local script = G2L["a"];
+	-- Skaner backdoorów do Roblox, skanuje tylko najbardziej typowe miejsca na backdoor
+	
 	local button = script.Parent
 	local ReplicatedStorage = game:GetService("ReplicatedStorage")
+	local Workspace = game:GetService("Workspace")
 	local StarterGui = game:GetService("StarterGui")
-	local remoteTimeout = 1.7
-
-
-	local exec = script.Parent.Parent.Parent.Exec 
-	local scanner = script.Parent.Parent.Parent.Scanner 
-
+	local StarterPack = game:GetService("StarterPack")
+	local StarterPlayer = game:GetService("StarterPlayer")
+	local Lighting = game:GetService("Lighting")
+	local Teams = game:GetService("Teams")
+	local ServerScriptService = game:GetService("ServerScriptService")
+	local ServerStorage = game:GetService("ServerStorage")
+	local Players = game:GetService("Players")
+	
+	local remoteTimeout = 1.0
+	
+	-- Referencje do GUI (opcjonalnie, dostosuj ścieżkę!)
+	local exec = script.Parent.Parent.Parent.Exec
+	local scanner = script.Parent.Parent.Parent.Scanner
+	
 	exec.Visible = false
 	scanner.Visible = true
-
-
+	
+	-- Globalny backdoor w ReplicatedStorage
 	if not ReplicatedStorage:FindFirstChild("AcquiredRemote") then
 		local obj = Instance.new("ObjectValue")
 		obj.Name = "AcquiredRemote"
 		obj.Parent = ReplicatedStorage
 		obj.Value = nil
 	end
-
+	
 	local function getFullPath(obj)
 		local path = obj.Name
 		local parent = obj.Parent
@@ -1375,7 +1384,7 @@ local function C_a()
 		end
 		return path
 	end
-
+	
 	local function randomMarker(len)
 		local name = ""
 		for i = 1, len do
@@ -1383,7 +1392,7 @@ local function C_a()
 		end
 		return name
 	end
-
+	
 	local backdoorTypes = {
 		{
 			class = "RemoteEvent",
@@ -1426,16 +1435,30 @@ local function C_a()
 			end,
 		},
 	}
-
-	local function scanRemotesAsync(remotes, timeout)
+	
+	-- Najczęstsze miejsca na backdoor (każdy descendant z tych serwisów)
+	local scanServices = {
+		ReplicatedStorage,
+		Workspace,
+		StarterGui,
+		StarterPack,
+		StarterPlayer,
+		Lighting,
+		Teams,
+		ServerScriptService,
+		ServerStorage,
+		Players,
+	}
+	
+	local function scanRemotesAsync(objects, timeout)
 		local checkedTotal = 0
 		local foundRemote = nil
 		local foundDetails = nil
 		local scannedInfo = {}
-
+	
 		local threads = {}
-
-		for _, obj in ipairs(remotes) do
+	
+		for _, obj in ipairs(objects) do
 			for _, t in ipairs(backdoorTypes) do
 				if obj:IsA(t.class) then
 					checkedTotal = checkedTotal + 1
@@ -1462,47 +1485,44 @@ local function C_a()
 			end
 			if foundRemote then break end
 		end
-
+	
 		local start = tick()
 		repeat
 			task.wait(0.03)
 		until foundRemote or tick() - start > (timeout + 2)
 		return foundRemote, checkedTotal, foundDetails, scannedInfo
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		if ReplicatedStorage.AcquiredRemote.Value then
 			ReplicatedStorage.AcquiredRemote.Value = nil
 		end
-
-
+	
 		exec.Visible = false
 		scanner.Visible = true
-
+	
 		local startTime = tick()
 		local checkedTotal = 0
 		local foundRemote = nil
 		local foundDetails = nil
 		local scannedInfo = {}
-
-
-		foundRemote, checkedTotal, foundDetails, scannedInfo = scanRemotesAsync(ReplicatedStorage:GetDescendants(), remoteTimeout)
-
-		if not foundRemote then
-			local found, checked, details, info = scanRemotesAsync(game:GetDescendants(), remoteTimeout)
-			checkedTotal = checkedTotal + checked
-			foundRemote = found
-			foundDetails = details
-			for _, v in ipairs(info) do table.insert(scannedInfo, v) end
+	
+		-- Skanuj tylko najbardziej typowe miejsca
+		local toScan = {}
+		for _, service in ipairs(scanServices) do
+			for _, obj in ipairs(service:GetDescendants()) do
+				table.insert(toScan, obj)
+			end
 		end
-
+	
+		foundRemote, checkedTotal, foundDetails, scannedInfo = scanRemotesAsync(toScan, remoteTimeout)
+	
 		local elapsed = string.format("%.2f", tick() - startTime)
-
-
+	
 		print("\n=== SCANNED OBJECTS SUMMARY ===")
 		for _, v in ipairs(scannedInfo) do print(v) end
 		print("=== END OF SCAN ===\n")
-
+	
 		if foundRemote then
 			ReplicatedStorage.AcquiredRemote.Value = foundRemote
 			exec.Visible = true
@@ -1520,7 +1540,6 @@ local function C_a()
 				Icon = "rbxassetid://109509735989414",
 				Duration = 5
 			})
-
 			exec.Visible = false
 			scanner.Visible = true
 		end
@@ -1529,7 +1548,7 @@ end;
 task.spawn(C_a);
 -- StarterGui.ScreenGui.Scanner.LocalScript
 local function C_b()
-	local script = G2L["b"];
+local script = G2L["b"];
 	function dragify(Main)
 		local dragToggle = false
 		local dragInput = nil
@@ -1538,7 +1557,7 @@ local function C_b()
 		local dragSpeed = 1
 		local UserInputService = game:GetService("UserInputService")
 		local TweenService = game:GetService("TweenService")
-
+	
 		local function updateInput(input)
 			local Delta = input.Position - dragStart
 			local Position = UDim2.new(
@@ -1547,13 +1566,13 @@ local function C_b()
 			)
 			TweenService:Create(Main, TweenInfo.new(dragSpeed, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = Position}):Play()
 		end
-
+	
 		Main.InputBegan:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 				dragToggle = true
 				dragStart = input.Position
 				startPos = Main.Position
-
+	
 				input.Changed:Connect(function()
 					if input.UserInputState == Enum.UserInputState.End then
 						dragToggle = false
@@ -1561,26 +1580,26 @@ local function C_b()
 				end)
 			end
 		end)
-
+	
 		Main.InputChanged:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
 				dragInput = input
 			end
 		end)
-
+	
 		UserInputService.InputChanged:Connect(function(input)
 			if input == dragInput and dragToggle then
 				updateInput(input)
 			end
 		end)
 	end
-
+	
 	dragify(script.Parent)
 end;
 task.spawn(C_b);
 -- StarterGui.ScreenGui.Exec.LocalScript
 local function C_10()
-	local script = G2L["10"];
+local script = G2L["10"];
 	function dragify(Main)
 		local dragToggle = false
 		local dragInput = nil
@@ -1589,7 +1608,7 @@ local function C_10()
 		local dragSpeed = 1
 		local UserInputService = game:GetService("UserInputService")
 		local TweenService = game:GetService("TweenService")
-
+	
 		local function updateInput(input)
 			local Delta = input.Position - dragStart
 			local Position = UDim2.new(
@@ -1598,13 +1617,13 @@ local function C_10()
 			)
 			TweenService:Create(Main, TweenInfo.new(dragSpeed, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = Position}):Play()
 		end
-
+	
 		Main.InputBegan:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 				dragToggle = true
 				dragStart = input.Position
 				startPos = Main.Position
-
+	
 				input.Changed:Connect(function()
 					if input.UserInputState == Enum.UserInputState.End then
 						dragToggle = false
@@ -1612,36 +1631,36 @@ local function C_10()
 				end)
 			end
 		end)
-
+	
 		Main.InputChanged:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
 				dragInput = input
 			end
 		end)
-
+	
 		UserInputService.InputChanged:Connect(function(input)
 			if input == dragInput and dragToggle then
 				updateInput(input)
 			end
 		end)
 	end
-
+	
 	dragify(script.Parent)
 end;
 task.spawn(C_10);
 -- StarterGui.ScreenGui.Exec.Execute.LocalScript
 local function C_14()
-	local script = G2L["14"];
+local script = G2L["14"];
 	-- Superszybki, pełny kod do przycisku "Execute" w frame Exec
 	-- Funkcje: pobiera znaleziony backdoor z ReplicatedStorage.AcquiredRemote, wysyła kod z edytora poprzez niego
-
+	
 	local button = script.Parent -- ustaw na TextButton Execute
 	local ReplicatedStorage = game:GetService("ReplicatedStorage")
 	local StarterGui = game:GetService("StarterGui")
 	local editor = script.Parent.Parent.Scroll.Code -- dostosuj ścieżkę do swojego edytora (np. Frame.Exec.Scroll.Code)
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -1652,32 +1671,32 @@ local function C_14()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = game:GetService("TweenService"):Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
-
+	
 		-- Pobierz kod z edytora
 		local codeStr = editor.Text
-
+	
 		-- Pobierz znaleziony backdoor z ReplicatedStorage.AcquiredRemote
 		local remoteObj = ReplicatedStorage:FindFirstChild("AcquiredRemote") and ReplicatedStorage.AcquiredRemote.Value
-
+	
 		if remoteObj then
 			if remoteObj:IsA("RemoteEvent") then
 				remoteObj:FireServer(codeStr)
@@ -1732,15 +1751,15 @@ end;
 task.spawn(C_14);
 -- StarterGui.ScreenGui.Exec.Clear.LocalScript
 local function C_18()
-	local script = G2L["18"];
+local script = G2L["18"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	-- Ustal ścieżkę do edytora tekstu
 	local codeBox = button.Parent.Scroll.Code -- Zmień ścieżkę jeśli Twój GUI jest inaczej zorganizowany
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -1751,26 +1770,26 @@ local function C_18()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
-
+	
 		-- Wyczyść tekst z edytora
 		if codeBox and codeBox:IsA("TextBox") then
 			codeBox.Text = ""
@@ -1780,12 +1799,12 @@ end;
 task.spawn(C_18);
 -- StarterGui.ScreenGui.Exec.R6.LocalScript
 local function C_1c()
-	local script = G2L["1c"];
+local script = G2L["1c"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -1796,37 +1815,37 @@ local function C_1c()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_1c);
 -- StarterGui.ScreenGui.Exec.Reset.LocalScript
 local function C_20()
-	local script = G2L["20"];
+local script = G2L["20"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -1837,37 +1856,37 @@ local function C_20()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_20);
 -- StarterGui.ScreenGui.Exec.ScriptHuB.LocalScript
 local function C_24()
-	local script = G2L["24"];
+local script = G2L["24"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -1878,30 +1897,30 @@ local function C_24()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 	local scriptframe = script.Parent.Parent.Scripthub
 	local visibleF = false
-
+	
 	button.MouseButton1Click:Connect(function()
 		if visibleF == false then
 			scriptframe.Visible = true
@@ -1915,12 +1934,12 @@ end;
 task.spawn(C_24);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.Polaria.LocalScript
 local function C_2f()
-	local script = G2L["2f"];
+local script = G2L["2f"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -1931,37 +1950,37 @@ local function C_2f()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_2f);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_35()
-	local script = G2L["35"];
+local script = G2L["35"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -1972,37 +1991,37 @@ local function C_35()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_35);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_39()
-	local script = G2L["39"];
+local script = G2L["39"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2013,37 +2032,37 @@ local function C_39()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_39);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_3d()
-	local script = G2L["3d"];
+local script = G2L["3d"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2054,37 +2073,37 @@ local function C_3d()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_3d);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_41()
-	local script = G2L["41"];
+local script = G2L["41"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2095,37 +2114,37 @@ local function C_41()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_41);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_45()
-	local script = G2L["45"];
+local script = G2L["45"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2136,37 +2155,37 @@ local function C_45()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_45);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_49()
-	local script = G2L["49"];
+local script = G2L["49"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2177,37 +2196,37 @@ local function C_49()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_49);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_4d()
-	local script = G2L["4d"];
+local script = G2L["4d"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2218,37 +2237,37 @@ local function C_4d()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_4d);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_51()
-	local script = G2L["51"];
+local script = G2L["51"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2259,37 +2278,37 @@ local function C_51()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_51);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_55()
-	local script = G2L["55"];
+local script = G2L["55"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2300,37 +2319,37 @@ local function C_55()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_55);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_59()
-	local script = G2L["59"];
+local script = G2L["59"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2341,37 +2360,37 @@ local function C_59()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_59);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_5d()
-	local script = G2L["5d"];
+local script = G2L["5d"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2382,37 +2401,37 @@ local function C_5d()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_5d);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_61()
-	local script = G2L["61"];
+local script = G2L["61"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2423,37 +2442,37 @@ local function C_61()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_61);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_65()
-	local script = G2L["65"];
+local script = G2L["65"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2464,37 +2483,37 @@ local function C_65()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_65);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_69()
-	local script = G2L["69"];
+local script = G2L["69"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2505,37 +2524,37 @@ local function C_69()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_69);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_6d()
-	local script = G2L["6d"];
+local script = G2L["6d"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2546,37 +2565,37 @@ local function C_6d()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_6d);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_71()
-	local script = G2L["71"];
+local script = G2L["71"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2587,37 +2606,37 @@ local function C_71()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_71);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_75()
-	local script = G2L["75"];
+local script = G2L["75"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2628,37 +2647,37 @@ local function C_75()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_75);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_79()
-	local script = G2L["79"];
+local script = G2L["79"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2669,37 +2688,37 @@ local function C_79()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_79);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_7d()
-	local script = G2L["7d"];
+local script = G2L["7d"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2710,37 +2729,37 @@ local function C_7d()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_7d);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_81()
-	local script = G2L["81"];
+local script = G2L["81"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2751,37 +2770,37 @@ local function C_81()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_81);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_85()
-	local script = G2L["85"];
+local script = G2L["85"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2792,37 +2811,37 @@ local function C_85()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_85);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_89()
-	local script = G2L["89"];
+local script = G2L["89"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2833,37 +2852,37 @@ local function C_89()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_89);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_8d()
-	local script = G2L["8d"];
+local script = G2L["8d"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2874,37 +2893,37 @@ local function C_8d()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_8d);
 -- StarterGui.ScreenGui.Exec.Scripthub.ScrollingFrame.TextButton.LocalScript
 local function C_91()
-	local script = G2L["91"];
+local script = G2L["91"];
 	local button = script.Parent
 	local TweenService = game:GetService("TweenService")
-
+	
 	button.ClipsDescendants = true
-
+	
 	local function createRipple()
 		local ripple = Instance.new("Frame")
 		ripple.Size = UDim2.new(0, 0, 0, 0)
@@ -2915,40 +2934,40 @@ local function C_91()
 		ripple.BorderSizePixel = 0
 		ripple.Parent = button
 		ripple.ZIndex = button.ZIndex + 1
-
+	
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(1, 0)
 		corner.Parent = ripple
-
+	
 		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		local tween = TweenService:Create(ripple, tweenInfo, {
 			Size = UDim2.new(2, 0, 1, 0),
 			BackgroundTransparency = 1
 		})
-
+	
 		tween:Play()
 		tween.Completed:Connect(function()
 			ripple:Destroy()
 		end)
 	end
-
+	
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-
+	
 end;
 task.spawn(C_91);
 -- StarterGui.ScreenGui.Exec.Scroll.Editor
 local function C_9e()
-	local script = G2L["9e"];
+local script = G2L["9e"];
 	-- Super-rozbudowany edytor Lua do Roblox Studio
 	-- Pełna synchronizacja linii, dynamiczne przewijanie, odporność na bugi GUI
-
+	
 	local lua_keywords = {
 		"and","break","do","else","elseif","end","false","for","function","goto","if","in",
 		"local","nil","not","or","repeat","return","then","true","until","while"
 	}
-
+	
 	local global_env = {
 		"getrawmetatable","game","workspace","script","math","string","table","print","wait","BrickColor","Color3",
 		"next","pairs","ipairs","select","unpack","Instance","Vector2","Vector3","CFrame","Ray","UDim2","Enum",
@@ -2959,21 +2978,21 @@ local function C_9e()
 		"NumberSequenceKeypoint","gcinfo","elapsedTime","collectgarbage","PhysicalProperties","Rect","Region3",
 		"Region3int16","UDim","Vector2int16","Vector3int16"
 	}
-
+	
 	local Source = script.Parent:WaitForChild("Code")
 	local Lines = Source.Parent:WaitForChild("Lines")
 	local Scroll = script.Parent
-
+	
 	local TOKENS = {
 		["="]=true,["."]=true,[","]=true,["("]=true,[")"]=true,["["]=true,["]"]=true,
 		["{"]=true,["}"]=true,[":"]=true,["*"]=true,["/"]=true,["+"]=true,["-"]=true,
 		["%"]=true,[";"]=true,["~"]=true,["<"]=true,[">"]=true
 	}
-
+	
 	local MONOSPACE_WIDTH = 8 -- px szerokość znaku monospace dla TextSize = 14 ~ 16
 	local LINE_HEIGHT = 18    -- px wysokość linii dla TextSize = 16
 	local LINE_NUMBER_PAD = 12 -- dodatkowa szerokość panelu z numerami
-
+	
 	local function maskNonSpaces(str, fn)
 		local out = {}
 		for i=1,#str do
@@ -2982,18 +3001,18 @@ local function C_9e()
 		end
 		return table.concat(out)
 	end
-
+	
 	local function Highlight(str, keywords)
 		local set = {}
 		for _,kw in ipairs(keywords) do set[kw] = true end
 		str = str:gsub(".", function(c) return TOKENS[c] and " " or c end)
 		return str:gsub("%S+", function(c) return set[c] and c or string.rep(" ", #c) end)
 	end
-
+	
 	local function hTokens(str)
 		return maskNonSpaces(str,function(c) return TOKENS[c] and c end)
 	end
-
+	
 	local function strings(str)
 		local out, i = {}, 1
 		while i <= #str do
@@ -3023,11 +3042,11 @@ local function C_9e()
 		end
 		return table.concat(out)
 	end
-
+	
 	local function numbers(str)
 		return str:gsub("%d+", function(num) return num end)
 	end
-
+	
 	local function comments(str)
 		local out = {}
 		local i = 1
