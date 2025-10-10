@@ -18,10 +18,11 @@ G2L["1"]["ResetOnSpawn"] = false;
 
 -- StarterGui.ScreenGui.Scanner
 G2L["2"] = Instance.new("Frame", G2L["1"]);
+G2L["2"]["Visible"] = false;
 G2L["2"]["BorderSizePixel"] = 0;
 G2L["2"]["BackgroundColor3"] = Color3.fromRGB(21, 21, 21);
-G2L["2"]["Size"] = UDim2.new(0, 335, 0, 205);
-G2L["2"]["Position"] = UDim2.new(0.32996, 0, 0.33279, 0);
+G2L["2"]["Size"] = UDim2.new(0, 491, 0, 295);
+G2L["2"]["Position"] = UDim2.new(0.33407, 0, 0.34254, 0);
 G2L["2"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["2"]["Name"] = [[Scanner]];
 
@@ -43,11 +44,11 @@ G2L["5"]["BorderSizePixel"] = 0;
 G2L["5"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
 -- [ERROR] cannot convert ImageContent, please report to "https://github.com/uniquadev/GuiToLuaConverter/issues"
 G2L["5"]["Image"] = [[rbxassetid://109509735989414]];
-G2L["5"]["Size"] = UDim2.new(0, 38, 0, 38);
+G2L["5"]["Size"] = UDim2.new(0, 50, 0, 50);
 G2L["5"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["5"]["BackgroundTransparency"] = 1;
 G2L["5"]["Name"] = [[Epixlaz]];
-G2L["5"]["Position"] = UDim2.new(0.03891, 0, 0.02927, 3);
+G2L["5"]["Position"] = UDim2.new(0.03478, 0, 0.01388, 3);
 
 
 -- StarterGui.ScreenGui.Scanner.Epixlaz.TextLabel
@@ -61,27 +62,26 @@ G2L["6"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], En
 G2L["6"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
 G2L["6"]["BackgroundTransparency"] = 1;
 G2L["6"]["RichText"] = true;
-G2L["6"]["Size"] = UDim2.new(0, 234, 0, 25);
+G2L["6"]["Size"] = UDim2.new(0, 311, 0, 43);
 G2L["6"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["6"]["Text"] = [[WeAreFSL backdoor scanner]];
-G2L["6"]["Position"] = UDim2.new(1.15789, 0, 0.15789, 0);
+G2L["6"]["Text"] = [[WeAreFSL Scanner Internal V2.0]];
+G2L["6"]["Position"] = UDim2.new(1.45789, 0, 0.1379, 0);
 
 
 -- StarterGui.ScreenGui.Scanner.Scan
 G2L["7"] = Instance.new("TextButton", G2L["2"]);
 G2L["7"]["TextWrapped"] = true;
 G2L["7"]["BorderSizePixel"] = 0;
-G2L["7"]["TextSize"] = 15;
-G2L["7"]["TextScaled"] = true;
+G2L["7"]["TextSize"] = 58;
 G2L["7"]["TextColor3"] = Color3.fromRGB(236, 236, 236);
 G2L["7"]["BackgroundColor3"] = Color3.fromRGB(26, 26, 26);
-G2L["7"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Medium, Enum.FontStyle.Normal);
+G2L["7"]["FontFace"] = Font.new([[rbxasset://fonts/families/Michroma.json]], Enum.FontWeight.Bold, Enum.FontStyle.Italic);
 G2L["7"]["AnchorPoint"] = Vector2.new(1, 0.5);
-G2L["7"]["Size"] = UDim2.new(0.36292, 125, 0.48392, -10);
+G2L["7"]["Size"] = UDim2.new(0.47904, 125, 0.5939, -10);
 G2L["7"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["7"]["Text"] = [[Scan for backdoors]];
 G2L["7"]["Name"] = [[Scan]];
-G2L["7"]["Position"] = UDim2.new(0.86983, 0, 0.52358, 0);
+G2L["7"]["Position"] = UDim2.new(0.8666, 0, 0.54543, 0);
 
 
 -- StarterGui.ScreenGui.Scanner.Scan.UICorner
@@ -111,8 +111,8 @@ G2L["c"]["Active"] = true;
 G2L["c"]["BorderSizePixel"] = 0;
 G2L["c"]["BackgroundColor3"] = Color3.fromRGB(21, 21, 21);
 G2L["c"]["Selectable"] = true;
-G2L["c"]["Size"] = UDim2.new(0, 515, 0, 323);
-G2L["c"]["Position"] = UDim2.new(0.23887, 0, 0.23701, 0);
+G2L["c"]["Size"] = UDim2.new(0, 574, 0, 350);
+G2L["c"]["Position"] = UDim2.new(0.23887, 0, 0.19941, 0);
 G2L["c"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["c"]["Name"] = [[Exec]];
 
@@ -148,7 +148,7 @@ G2L["11"]["TextColor3"] = Color3.fromRGB(236, 236, 236);
 G2L["11"]["BackgroundColor3"] = Color3.fromRGB(26, 26, 26);
 G2L["11"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Medium, Enum.FontStyle.Normal);
 G2L["11"]["AnchorPoint"] = Vector2.new(1, 0.5);
-G2L["11"]["Size"] = UDim2.new(-0.1068, 125, 0.37173, -10);
+G2L["11"]["Size"] = UDim2.new(-0.08763, 125, 0.37173, -10);
 G2L["11"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["11"]["Text"] = [[Execute]];
 G2L["11"]["Name"] = [[Execute]];
@@ -179,7 +179,7 @@ G2L["15"]["TextColor3"] = Color3.fromRGB(236, 236, 236);
 G2L["15"]["BackgroundColor3"] = Color3.fromRGB(26, 26, 26);
 G2L["15"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Medium, Enum.FontStyle.Normal);
 G2L["15"]["AnchorPoint"] = Vector2.new(1, 0.5);
-G2L["15"]["Size"] = UDim2.new(-0.1068, 125, 0.37173, -10);
+G2L["15"]["Size"] = UDim2.new(-0.08763, 125, 0.37173, -10);
 G2L["15"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["15"]["Text"] = [[Clear]];
 G2L["15"]["Name"] = [[Clear]];
@@ -214,7 +214,7 @@ G2L["19"]["Size"] = UDim2.new(-0.07184, 125, 0.11476, -10);
 G2L["19"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["19"]["Text"] = [[R6]];
 G2L["19"]["Name"] = [[R6]];
-G2L["19"]["Position"] = UDim2.new(0.60388, 0, 0.93643, 0);
+G2L["19"]["Position"] = UDim2.new(0.65963, 0, 0.93643, 0);
 
 
 -- StarterGui.ScreenGui.Exec.R6.UICorner
@@ -245,7 +245,7 @@ G2L["1d"]["Size"] = UDim2.new(-0.07184, 125, 0.11476, -10);
 G2L["1d"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["1d"]["Text"] = [[Reset]];
 G2L["1d"]["Name"] = [[Reset]];
-G2L["1d"]["Position"] = UDim2.new(0.79612, 0, 0.93643, 0);
+G2L["1d"]["Position"] = UDim2.new(0.82399, 0, 0.93643, 0);
 
 
 -- StarterGui.ScreenGui.Exec.Reset.UICorner
@@ -264,33 +264,35 @@ G2L["20"] = Instance.new("LocalScript", G2L["1d"]);
 
 
 
--- StarterGui.ScreenGui.Exec.ScriptHuB
+-- StarterGui.ScreenGui.Exec.Scan
 G2L["21"] = Instance.new("TextButton", G2L["c"]);
+G2L["21"]["TextWrapped"] = true;
 G2L["21"]["BorderSizePixel"] = 0;
 G2L["21"]["TextSize"] = 15;
+G2L["21"]["TextScaled"] = true;
 G2L["21"]["TextColor3"] = Color3.fromRGB(236, 236, 236);
 G2L["21"]["BackgroundColor3"] = Color3.fromRGB(36, 36, 36);
 G2L["21"]["FontFace"] = Font.new([[rbxasset://fonts/families/GothamSSm.json]], Enum.FontWeight.Medium, Enum.FontStyle.Normal);
 G2L["21"]["AnchorPoint"] = Vector2.new(1, 0.5);
 G2L["21"]["Size"] = UDim2.new(-0.07184, 125, 0.11476, -10);
 G2L["21"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["21"]["Text"] = [[Script hub]];
-G2L["21"]["Name"] = [[ScriptHuB]];
+G2L["21"]["Text"] = [[Scanner Backup]];
+G2L["21"]["Name"] = [[Scan]];
 G2L["21"]["Position"] = UDim2.new(0.98447, 0, 0.93643, 0);
 
 
--- StarterGui.ScreenGui.Exec.ScriptHuB.UICorner
+-- StarterGui.ScreenGui.Exec.Scan.UICorner
 G2L["22"] = Instance.new("UICorner", G2L["21"]);
 
 
 
--- StarterGui.ScreenGui.Exec.ScriptHuB.UIStroke
+-- StarterGui.ScreenGui.Exec.Scan.UIStroke
 G2L["23"] = Instance.new("UIStroke", G2L["21"]);
 G2L["23"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border;
 G2L["23"]["Color"] = Color3.fromRGB(40, 40, 40);
 
 
--- StarterGui.ScreenGui.Exec.ScriptHuB.LocalScript
+-- StarterGui.ScreenGui.Exec.Scan.LocalScript
 G2L["24"] = Instance.new("LocalScript", G2L["21"]);
 
 
@@ -301,7 +303,7 @@ G2L["25"]["BorderSizePixel"] = 0;
 G2L["25"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
 -- [ERROR] cannot convert ImageContent, please report to "https://github.com/uniquadev/GuiToLuaConverter/issues"
 G2L["25"]["Image"] = [[rbxassetid://109509735989414]];
-G2L["25"]["Size"] = UDim2.new(0, 38, 0, 38);
+G2L["25"]["Size"] = UDim2.new(0, 40, 0, 39);
 G2L["25"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 G2L["25"]["BackgroundTransparency"] = 1;
 G2L["25"]["Name"] = [[Epixlaz]];
@@ -321,8 +323,8 @@ G2L["26"]["BackgroundTransparency"] = 1;
 G2L["26"]["RichText"] = true;
 G2L["26"]["Size"] = UDim2.new(0, 243, 0, 37);
 G2L["26"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["26"]["Text"] = [[WeAreFSL Internal]];
-G2L["26"]["Position"] = UDim2.new(3.10526, 0, 0.02632, 0);
+G2L["26"]["Text"] = [[WeAreFSL Internal V2.0]];
+G2L["26"]["Position"] = UDim2.new(4.20526, 0, 0.02632, 0);
 
 
 -- StarterGui.ScreenGui.Exec.Scripthub
@@ -1154,6 +1156,7 @@ G2L["92"]["BackgroundTransparency"] = 0.5;
 
 -- StarterGui.ScreenGui.Exec.Scroll.Code
 G2L["93"] = Instance.new("TextBox", G2L["92"]);
+G2L["93"]["CursorPosition"] = -1;
 G2L["93"]["Name"] = [[Code]];
 G2L["93"]["TextXAlignment"] = Enum.TextXAlignment.Left;
 G2L["93"]["BorderSizePixel"] = 0;
@@ -1166,6 +1169,7 @@ G2L["93"]["Selectable"] = false;
 G2L["93"]["MultiLine"] = true;
 G2L["93"]["AnchorPoint"] = Vector2.new(1, 0);
 G2L["93"]["ClearTextOnFocus"] = false;
+G2L["93"]["PlaceholderText"] = [[require(101010).Skid()]];
 G2L["93"]["Size"] = UDim2.new(0.93537, 0, 1, 0);
 G2L["93"]["Position"] = UDim2.new(0.9791, 0, 0, 0);
 G2L["93"]["BorderColor3"] = Color3.fromRGB(28, 43, 54);
@@ -1344,7 +1348,6 @@ G2L["9e"]["Name"] = [[Editor]];
 -- StarterGui.ScreenGui.Scanner.Scan.LocalScript
 local function C_a()
 local script = G2L["a"];
-	-- Skaner backdoorów do Roblox, skanuje tylko najbardziej typowe miejsca na backdoor
 	
 	local button = script.Parent
 	local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -1360,7 +1363,7 @@ local script = G2L["a"];
 	
 	local remoteTimeout = 1.0
 	
-	-- Referencje do GUI (opcjonalnie, dostosuj ścieżkę!)
+	
 	local exec = script.Parent.Parent.Parent.Exec
 	local scanner = script.Parent.Parent.Parent.Scanner
 	
@@ -1436,7 +1439,7 @@ local script = G2L["a"];
 		},
 	}
 	
-	-- Najczęstsze miejsca na backdoor (każdy descendant z tych serwisów)
+	
 	local scanServices = {
 		ReplicatedStorage,
 		Workspace,
@@ -1507,7 +1510,7 @@ local script = G2L["a"];
 		local foundDetails = nil
 		local scannedInfo = {}
 	
-		-- Skanuj tylko najbardziej typowe miejsca
+	
 		local toScan = {}
 		for _, service in ipairs(scanServices) do
 			for _, obj in ipairs(service:GetDescendants()) do
@@ -1879,56 +1882,196 @@ local script = G2L["20"];
 	
 end;
 task.spawn(C_20);
--- StarterGui.ScreenGui.Exec.ScriptHuB.LocalScript
+-- StarterGui.ScreenGui.Exec.Scan.LocalScript
 local function C_24()
 local script = G2L["24"];
+	
 	local button = script.Parent
-	local TweenService = game:GetService("TweenService")
+	local ReplicatedStorage = game:GetService("ReplicatedStorage")
+	local Workspace = game:GetService("Workspace")
+	local StarterGui = game:GetService("StarterGui")
+	local StarterPack = game:GetService("StarterPack")
+	local StarterPlayer = game:GetService("StarterPlayer")
+	local Lighting = game:GetService("Lighting")
+	local Teams = game:GetService("Teams")
+	local ServerScriptService = game:GetService("ServerScriptService")
+	local ServerStorage = game:GetService("ServerStorage")
+	local Players = game:GetService("Players")
 	
-	button.ClipsDescendants = true
+	local remoteTimeout = 2.0
 	
-	local function createRipple()
-		local ripple = Instance.new("Frame")
-		ripple.Size = UDim2.new(0, 0, 0, 0)
-		ripple.Position = UDim2.new(0.5, 0, 0.5, 0)
-		ripple.AnchorPoint = Vector2.new(0.5, 0.5)
-		ripple.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		ripple.BackgroundTransparency = 0.5
-		ripple.BorderSizePixel = 0
-		ripple.Parent = button
-		ripple.ZIndex = button.ZIndex + 1
 	
-		local corner = Instance.new("UICorner")
-		corner.CornerRadius = UDim.new(1, 0)
-		corner.Parent = ripple
 	
-		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-		local tween = TweenService:Create(ripple, tweenInfo, {
-			Size = UDim2.new(2, 0, 1, 0),
-			BackgroundTransparency = 1
-		})
 	
-		tween:Play()
-		tween.Completed:Connect(function()
-			ripple:Destroy()
-		end)
+	-- Globalny backdoor w ReplicatedStorage
+	if not ReplicatedStorage:FindFirstChild("AcquiredRemote") then
+		local obj = Instance.new("ObjectValue")
+		obj.Name = "AcquiredRemote"
+		obj.Parent = ReplicatedStorage
+		obj.Value = nil
+	end
+	
+	local function getFullPath(obj)
+		local path = obj.Name
+		local parent = obj.Parent
+		while parent and parent ~= game do
+			path = parent.Name .. "/" .. path
+			parent = parent.Parent
+		end
+		return path
+	end
+	
+	local function randomMarker(len)
+		local name = ""
+		for i = 1, len do
+			name = name .. string.char(math.random(65, 90))
+		end
+		return name
+	end
+	
+	local backdoorTypes = {
+		{
+			class = "RemoteEvent",
+			desc = "RemoteEvent FireServer",
+			activate = function(obj, marker)
+				obj:FireServer('Instance.new("Model",workspace).Name="'..marker..'"')
+			end,
+			detect = function(marker)
+				return workspace:FindFirstChild(marker)
+			end,
+		},
+		{
+			class = "RemoteFunction",
+			desc = "RemoteFunction InvokeServer",
+			activate = function(obj, marker)
+				task.spawn(function() obj:InvokeServer('Instance.new("Model",workspace).Name="'..marker..'"') end)
+			end,
+			detect = function(marker)
+				return workspace:FindFirstChild(marker)
+			end,
+		},
+		{
+			class = "BindableEvent",
+			desc = "BindableEvent Fire",
+			activate = function(obj, marker)
+				obj:Fire(marker)
+			end,
+			detect = function(marker)
+				return workspace:FindFirstChild(marker)
+			end,
+		},
+		{
+			class = "BindableFunction",
+			desc = "BindableFunction Invoke",
+			activate = function(obj, marker)
+				task.spawn(function() obj:Invoke(marker) end)
+			end,
+			detect = function(marker)
+				return workspace:FindFirstChild(marker)
+			end,
+		},
+	}
+	
+	
+	local scanServices = {
+		ReplicatedStorage,
+		Workspace,
+		StarterGui,
+		StarterPack,
+		StarterPlayer,
+		Lighting,
+		Teams,
+		ServerScriptService,
+		ServerStorage,
+		Players,
+	}
+	
+	local function scanRemotesAsync(objects, timeout)
+		local checkedTotal = 0
+		local foundRemote = nil
+		local foundDetails = nil
+		local scannedInfo = {}
+	
+		local threads = {}
+	
+		for _, obj in ipairs(objects) do
+			for _, t in ipairs(backdoorTypes) do
+				if obj:IsA(t.class) then
+					checkedTotal = checkedTotal + 1
+					local marker = randomMarker(24)
+					local info = string.format("[SCAN BACKUP] Path: %s | Type: %s | Name: %s", getFullPath(obj), t.class, obj.Name)
+					table.insert(scannedInfo, info)
+					print(info)
+					table.insert(threads, task.spawn(function()
+						t.activate(obj, marker)
+						local t1 = tick()
+						repeat task.wait(0.01) until t.detect(marker) or tick() - t1 > timeout
+						if t.detect(marker) and not foundRemote then
+							foundRemote = obj
+							foundDetails = {
+								path = getFullPath(obj),
+								class = t.class,
+								desc = t.desc,
+								marker = marker,
+							}
+							print(string.format("[BACKDOOR FOUND] %s | Type: %s | Desc: %s", foundDetails.path, foundDetails.class, t.desc))
+						end
+					end))
+				end
+			end
+			if foundRemote then break end
+		end
+	
+		local start = tick()
+		repeat
+			task.wait(0.03)
+		until foundRemote or tick() - start > (timeout + 2)
+		return foundRemote, checkedTotal, foundDetails, scannedInfo
 	end
 	
 	button.MouseButton1Click:Connect(function()
-		createRipple()
-	end)
+		if ReplicatedStorage.AcquiredRemote.Value then
+			ReplicatedStorage.AcquiredRemote.Value = nil
+		end
 	
-	local scriptframe = script.Parent.Parent.Scripthub
-	local visibleF = false
+		local startTime = tick()
+		local checkedTotal = 0
+		local foundRemote = nil
+		local foundDetails = nil
+		local scannedInfo = {}
 	
-	button.MouseButton1Click:Connect(function()
-		if visibleF == false then
-			scriptframe.Visible = true
-			visibleF = true
+	
+		local toScan = {}
+		for _, service in ipairs(scanServices) do
+			for _, obj in ipairs(service:GetDescendants()) do
+				table.insert(toScan, obj)
+			end
+		end
+	
+		foundRemote, checkedTotal, foundDetails, scannedInfo = scanRemotesAsync(toScan, remoteTimeout)
+	
+		local elapsed = string.format("%.2f", tick() - startTime)
+	
+		print("\n=== SCANNED OBJECTS SUMMARY ===")
+		for _, v in ipairs(scannedInfo) do print(v) end
+		print("=== END OF SCAN ===\n")
+	
+		if foundRemote then
+			ReplicatedStorage.AcquiredRemote.Value = foundRemote
+			StarterGui:SetCore("SendNotification", {
+				Title = "Backdoor found!",
+				Text = "Time: "..elapsed.."s\nChecked: "..checkedTotal.." remotes/bindables",
+				Icon = "rbxassetid://109509735989414",
+				Duration = 5
+			})
 		else
-			scriptframe.Visible = false
-			visibleF = false
-		end	
+			StarterGui:SetCore("SendNotification", {
+				Title = "No backdoors :(",
+				Text = "Time: "..elapsed.."s\nChecked: "..checkedTotal.." remotes/bindables\nNo working backdoors found",
+				Icon = "rbxassetid://109509735989414",
+				Duration = 5
+			})
+		end
 	end)
 end;
 task.spawn(C_24);
@@ -2954,20 +3097,20 @@ local script = G2L["91"];
 	button.MouseButton1Click:Connect(function()
 		createRipple()
 	end)
-	
+
 end;
 task.spawn(C_91);
 -- StarterGui.ScreenGui.Exec.Scroll.Editor
 local function C_9e()
-local script = G2L["9e"];
+	local script = G2L["9e"];
 	-- Super-rozbudowany edytor Lua do Roblox Studio
 	-- Pełna synchronizacja linii, dynamiczne przewijanie, odporność na bugi GUI
-	
+
 	local lua_keywords = {
 		"and","break","do","else","elseif","end","false","for","function","goto","if","in",
 		"local","nil","not","or","repeat","return","then","true","until","while"
 	}
-	
+
 	local global_env = {
 		"getrawmetatable","game","workspace","script","math","string","table","print","wait","BrickColor","Color3",
 		"next","pairs","ipairs","select","unpack","Instance","Vector2","Vector3","CFrame","Ray","UDim2","Enum",
@@ -2978,21 +3121,21 @@ local script = G2L["9e"];
 		"NumberSequenceKeypoint","gcinfo","elapsedTime","collectgarbage","PhysicalProperties","Rect","Region3",
 		"Region3int16","UDim","Vector2int16","Vector3int16"
 	}
-	
+
 	local Source = script.Parent:WaitForChild("Code")
 	local Lines = Source.Parent:WaitForChild("Lines")
 	local Scroll = script.Parent
-	
+
 	local TOKENS = {
 		["="]=true,["."]=true,[","]=true,["("]=true,[")"]=true,["["]=true,["]"]=true,
 		["{"]=true,["}"]=true,[":"]=true,["*"]=true,["/"]=true,["+"]=true,["-"]=true,
 		["%"]=true,[";"]=true,["~"]=true,["<"]=true,[">"]=true
 	}
-	
+
 	local MONOSPACE_WIDTH = 8 -- px szerokość znaku monospace dla TextSize = 14 ~ 16
 	local LINE_HEIGHT = 18    -- px wysokość linii dla TextSize = 16
 	local LINE_NUMBER_PAD = 12 -- dodatkowa szerokość panelu z numerami
-	
+
 	local function maskNonSpaces(str, fn)
 		local out = {}
 		for i=1,#str do
@@ -3001,18 +3144,18 @@ local script = G2L["9e"];
 		end
 		return table.concat(out)
 	end
-	
+
 	local function Highlight(str, keywords)
 		local set = {}
 		for _,kw in ipairs(keywords) do set[kw] = true end
 		str = str:gsub(".", function(c) return TOKENS[c] and " " or c end)
 		return str:gsub("%S+", function(c) return set[c] and c or string.rep(" ", #c) end)
 	end
-	
+
 	local function hTokens(str)
 		return maskNonSpaces(str,function(c) return TOKENS[c] and c end)
 	end
-	
+
 	local function strings(str)
 		local out, i = {}, 1
 		while i <= #str do
@@ -3042,11 +3185,11 @@ local script = G2L["9e"];
 		end
 		return table.concat(out)
 	end
-	
+
 	local function numbers(str)
 		return str:gsub("%d+", function(num) return num end)
 	end
-	
+
 	local function comments(str)
 		local out = {}
 		local i = 1
